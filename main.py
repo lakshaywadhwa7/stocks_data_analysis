@@ -56,18 +56,16 @@ class Factory:
         data['Date'] = data.index
         data.reset_index(drop=True, inplace=True)
         data['Date'] = data['Date'].astype(str)
-        #data = data.dropna()
         data['streak_up'] = data['Close'].rolling(5).apply(lambda x: np.all(np.diff(x) > 0)).astype('boolean')
         data['streak_up'] = data['streak_up'].fillna(False)
-        #data['streak_up'] = data['streak_up'].fillna(False)
         return data
+    
     #preprocess data based on streak (decrease)
     def preprocess_data_price_streak_decrease(self, data):
         data = data[['Close']]
         data['Date'] = data.index
         data.reset_index(drop=True, inplace=True)
         data['Date'] = data['Date'].astype(str)
-        # data = data.dropna()
         data['streak_down'] = data['Close'].rolling(4).apply(lambda x: np.all(np.diff(x) < 0)).astype('boolean')
         data['streak_down'] = data['streak_down'].fillna(False)
         return data
@@ -103,7 +101,6 @@ class Factory:
         ax.legend(loc='best')
         ax.set_ylabel('Price in Euros')
         plt.savefig( 'plot.png' )
-        ##ax.xaxis.set_major_formatter(my_year_month_fmt)
 
     def plot_monthly_average(self,data):
         fig, ax = plt.subplots(figsize=(16, 9))
