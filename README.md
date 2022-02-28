@@ -5,4 +5,4 @@ Please use a virtual environment:
 
 After this, please do: pip install -r requirements.txt
 
-AFter this just do python main.py in directory to run the code and it would produce all required graphs.
+After this just do python main.py in directory to run the code and it would produce all required graphs.
