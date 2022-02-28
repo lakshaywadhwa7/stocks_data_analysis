@@ -1,40 +1,40 @@
 import nasdaqdatalink
 from sklearn.linear_model import LinearRegression
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-#% matplotlib inline
 import pandas as pd
 import numpy as np
 import seaborn as sns
 sns.set(style='darkgrid', context='talk', palette='Dark2')
 
 class Factory:
+    ##function to load the data
     def load_data(self):
         data = nasdaqdatalink.get("FSE/BDT_X")
         return data
-
+    ##function to preprocess monthly data
     def preprocess_data_monthly_average(self, data):
         data_price = data[['Close']]
         data_price['Date'] = data_price.index
         data_price.reset_index(drop=True, inplace=True)
         data_price['Date'] = data_price['Date'].astype(str)
         data_price = data_price.dropna()
+        ##converting records to tuple
         records = data_price.to_records(index=False)
+        ##converting records to list of tuples
         records = list(records)
         dic = {}
         for val, date in records:
-            # split the date string at '-' and assign the first  2 items to  year,month
+            # split the date string at '-' and assign the first  2 items to  year,month in list of records
             year, month = date.split('-')[:2]
             # now check if (month,year) is there in the dict
             if (month, year) not in dic:
                 # if the tuple was not found then initialise one with an empty list
                 dic[month, year] = []
+            # appending the value to the (month,year) key
+            dic[month, year].append(val)  
 
-            dic[month, year].append(val)  # append val to the (month,year) key
-
-        # Now iterate over key,value items and do some calculations to get the desired output
+        #  Iterate over key,value items to calculate average
         lis = []
         for key, val in dic.items():
             new_key = "-".join(key)
@@ -44,12 +44,13 @@ class Factory:
 
         average_monthly_data_df['date'] = pd.to_datetime(average_monthly_data_df['date'], format='%m-%Y')
         return average_monthly_data_df
-
+     #  calculate rolling average for window(number of days) defined
     def preprocess_data_rolling_average(self, data, window):
         rolling_data = data['Close'].rolling(window=window).mean()
         rolling_data = pd.DataFrame(rolling_data, columns=['Close'])
         return rolling_data
-
+    
+    #preprocess data based on streak (increase)
     def preprocess_data_price_streak_increase(self, data):
         data = data[['Close']]
         data['Date'] = data.index
@@ -60,7 +61,7 @@ class Factory:
         data['streak_up'] = data['streak_up'].fillna(False)
         #data['streak_up'] = data['streak_up'].fillna(False)
         return data
-
+    #preprocess data based on streak (decrease)
     def preprocess_data_price_streak_decrease(self, data):
         data = data[['Close']]
         data['Date'] = data.index
@@ -70,7 +71,8 @@ class Factory:
         data['streak_down'] = data['Close'].rolling(4).apply(lambda x: np.all(np.diff(x) < 0)).astype('boolean')
         data['streak_down'] = data['streak_down'].fillna(False)
         return data
-
+    
+    ##calculate the regression 
     def regression(self, data,n):
         data = data[['Close']]
         data=data.dropna()
