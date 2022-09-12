@@ -1,4 +1,4 @@
-# NASDAQ_data_analysis
+# stock_data_analysis
 Please use a virtual environment:
 1. conda create -n venv python=3.7
 2. conda activate venv
